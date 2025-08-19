@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.4.0
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: gregory.mooney@quantstack.net
+author_name: gjmooney
+has_binder: false
+has_settings: false
+kind: frontend-and-server
+labextension_name: server-paste
+project_short_description: Use server to get clipboard contents
+python_name: server_paste
+repository: ''
+test: false
+
