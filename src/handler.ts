@@ -29,17 +29,28 @@ export async function requestAPI<T>(
   }
 
   let data: any = await response.text();
-
+  let isJSON = false;
   if (data.length > 0) {
     try {
       data = JSON.parse(data);
+      isJSON = true;
     } catch (error) {
       console.log('Not a JSON response body.', response);
     }
   }
 
   if (!response.ok) {
-    throw new ServerConnection.ResponseError(response, data.message || data);
+    if (isJSON) {
+      const { message, traceback } = data;
+      throw new ServerConnection.ResponseError(
+        response,
+        message ||
+          `Invalid response: ${response.status} ${response.statusText}`,
+        traceback || ''
+      );
+    } else {
+      throw new ServerConnection.ResponseError(response, data);
+    }
   }
 
   return data;
