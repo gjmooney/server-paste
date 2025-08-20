@@ -30,6 +30,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       const textarea = document.createElement('textarea');
       content.node.appendChild(textarea);
+      textarea.className = 'server-paste-text';
 
       // Create custom context menu for the textarea
       const contextMenu = document.createElement('div');
@@ -59,23 +60,21 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       // Handle paste option click
       pasteOption.addEventListener('click', () => {
-        console.log('Paste option clicked!');
         requestAPI<any>('clipboard')
           .then(data => {
-            console.log(data);
             // Replace current selection with clipboard data
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const currentValue = textarea.value;
             const newValue =
               currentValue.substring(0, start) +
-              data +
+              data.content +
               currentValue.substring(end);
             textarea.value = newValue;
 
             // Set cursor position after the pasted content
-            textarea.selectionStart = start + data.length;
-            textarea.selectionEnd = start + data.length;
+            textarea.selectionStart = start + data.content.length;
+            textarea.selectionEnd = start + data.content.length;
 
             // Focus the textarea to maintain user interaction
             textarea.focus();

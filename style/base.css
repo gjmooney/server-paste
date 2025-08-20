@@ -4,6 +4,10 @@
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
 
+.server-paste-text {
+    width: 500px;
+    height: 500px;
+}
 /* Context Menu Styles */
 .server-paste-context-menu {
     position: fixed;

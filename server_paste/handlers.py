@@ -10,8 +10,6 @@ class ClipboardHandler(APIHandler):
     Handles clipboard operations.
     """
     def initialize(self):
-        print('pyperclip')
-
         return super().initialize()
 
     @tornado.web.authenticated
@@ -40,6 +38,7 @@ class ClipboardHandler(APIHandler):
                 "message": f"Error retrieving clipboard content: {str(e)}"
             }
 
+
         self.finish(result)
 
     def _get_clipboard_content(self):
@@ -47,7 +46,6 @@ class ClipboardHandler(APIHandler):
         Get clipboard content using tkinter.
         """
         cbText = pyperclip.paste()
-        print('cbText', cbText)
         return cbText
 
 
