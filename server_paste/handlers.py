@@ -3,13 +3,15 @@ import json
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
 import tornado
-import tkinter as tk
+import pyperclip
 
 class ClipboardHandler(APIHandler):
     """
     Handles clipboard operations.
     """
     def initialize(self):
+        print('pyperclip')
+
         return super().initialize()
 
     @tornado.web.authenticated
@@ -44,15 +46,9 @@ class ClipboardHandler(APIHandler):
         """
         Get clipboard content using tkinter.
         """
-        root = tk.Tk()
-        root.withdraw()  # Hide the window
-        try:
-            clipboard_content = root.clipboard_get()
-            return clipboard_content
-        except tk.TclError:
-            return None
-        finally:
-            root.destroy()
+        cbText = pyperclip.paste()
+        print('cbText', cbText)
+        return cbText
 
 
 

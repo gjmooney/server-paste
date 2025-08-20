@@ -2,7 +2,9 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
+import { ILauncher } from '@jupyterlab/launcher';
+import { Clipboard } from '@jupyterlab/apputils';
+import { MainAreaWidget } from '@jupyterlab/apputils';
 import { Widget } from '@lumino/widgets';
 import { requestAPI } from './handler';
 
@@ -13,8 +15,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'server-paste:plugin',
   description: 'Use server to get clipboard contents',
   autoStart: true,
-  requires: [ICommandPalette],
-  activate: (app: JupyterFrontEnd, palette: ICommandPalette) => {
+  requires: [ILauncher],
+  activate: (app: JupyterFrontEnd, launcher: ILauncher) => {
     console.log('JupyterLab extension server-paste is activated!');
 
     // Define a widget creator function,
@@ -31,38 +33,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       // Create custom context menu for the textarea
       const contextMenu = document.createElement('div');
-      contextMenu.style.cssText = `
-        position: fixed;
-        background: white;
-        color: black;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        padding: 4px 0;
-        display: none;
-        z-index: 1000;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-size: 14px;
-      `;
+      contextMenu.className = 'server-paste-context-menu';
 
       // Create copy option
       const copyOption = document.createElement('div');
       copyOption.textContent = 'Copy';
-      copyOption.style.cssText = `
-        padding: 8px 16px;
-        cursor: pointer;
-        user-select: none;
-        border-bottom: 1px solid #eee;
-      `;
-
-      // Add hover effect for copy option
-      copyOption.addEventListener('mouseenter', () => {
-        copyOption.style.backgroundColor = '#f0f0f0';
-      });
-
-      copyOption.addEventListener('mouseleave', () => {
-        copyOption.style.backgroundColor = 'transparent';
-      });
+      copyOption.className = 'server-paste-menu-option copy-option';
 
       // Handle copy option click
       copyOption.addEventListener('click', () => {
@@ -71,38 +47,15 @@ const plugin: JupyterFrontEndPlugin<void> = {
           textarea.selectionStart,
           textarea.selectionEnd
         );
-        if (selectedText) {
-          navigator.clipboard
-            .writeText(selectedText)
-            .then(() => {
-              console.log('Text copied to clipboard:', selectedText);
-            })
-            .catch(err => {
-              console.error('Failed to copy text:', err);
-            });
-        } else {
-          console.log('No text selected to copy');
-        }
+        console.log('selectedText', selectedText);
+        Clipboard.copyToSystem(selectedText);
         contextMenu.style.display = 'none';
       });
 
       // Create paste option
       const pasteOption = document.createElement('div');
       pasteOption.textContent = 'Paste';
-      pasteOption.style.cssText = `
-        padding: 8px 16px;
-        cursor: pointer;
-        user-select: none;
-      `;
-
-      // Add hover effect for paste option
-      pasteOption.addEventListener('mouseenter', () => {
-        pasteOption.style.backgroundColor = '#f0f0f0';
-      });
-
-      pasteOption.addEventListener('mouseleave', () => {
-        pasteOption.style.backgroundColor = 'transparent';
-      });
+      pasteOption.className = 'server-paste-menu-option';
 
       // Handle paste option click
       pasteOption.addEventListener('click', () => {
@@ -161,11 +114,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       return widget;
     };
-    let widget = newWidget();
 
-    app.shell.add(widget, 'main');
-    // Activate the widget
-    app.shell.activateById(widget.id);
+    let widget = newWidget();
 
     // Add an application command
     const command: string = 'server-paste:open';
@@ -186,7 +136,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     });
 
     // Add the command to the palette.
-    palette.addItem({ command, category: 'Tutorial' });
+    launcher.add({ command });
   }
 };
 
