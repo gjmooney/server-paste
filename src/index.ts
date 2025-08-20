@@ -24,7 +24,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
       const content = new Widget();
       const widget = new MainAreaWidget({ content });
       widget.id = 'server-paste';
-      widget.title.label = 'Astronomy Picture';
       widget.title.closable = true;
 
       const textarea = document.createElement('textarea');
@@ -46,6 +45,47 @@ const plugin: JupyterFrontEndPlugin<void> = {
         font-size: 14px;
       `;
 
+      // Create copy option
+      const copyOption = document.createElement('div');
+      copyOption.textContent = 'Copy';
+      copyOption.style.cssText = `
+        padding: 8px 16px;
+        cursor: pointer;
+        user-select: none;
+        border-bottom: 1px solid #eee;
+      `;
+
+      // Add hover effect for copy option
+      copyOption.addEventListener('mouseenter', () => {
+        copyOption.style.backgroundColor = '#f0f0f0';
+      });
+
+      copyOption.addEventListener('mouseleave', () => {
+        copyOption.style.backgroundColor = 'transparent';
+      });
+
+      // Handle copy option click
+      copyOption.addEventListener('click', () => {
+        console.log('Copy option clicked!');
+        const selectedText = textarea.value.substring(
+          textarea.selectionStart,
+          textarea.selectionEnd
+        );
+        if (selectedText) {
+          navigator.clipboard
+            .writeText(selectedText)
+            .then(() => {
+              console.log('Text copied to clipboard:', selectedText);
+            })
+            .catch(err => {
+              console.error('Failed to copy text:', err);
+            });
+        } else {
+          console.log('No text selected to copy');
+        }
+        contextMenu.style.display = 'none';
+      });
+
       // Create paste option
       const pasteOption = document.createElement('div');
       pasteOption.textContent = 'Paste';
@@ -55,7 +95,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         user-select: none;
       `;
 
-      // Add hover effect
+      // Add hover effect for paste option
       pasteOption.addEventListener('mouseenter', () => {
         pasteOption.style.backgroundColor = '#f0f0f0';
       });
@@ -95,6 +135,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         contextMenu.style.display = 'none';
       });
 
+      contextMenu.appendChild(copyOption);
       contextMenu.appendChild(pasteOption);
       document.body.appendChild(contextMenu);
 
